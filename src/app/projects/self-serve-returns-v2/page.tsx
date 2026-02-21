@@ -11,7 +11,7 @@ import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 import "../self-serve-returns/page.css";
 
-const VIDEO_INDICES = new Set([2]);
+const VIDEO_INDICES = new Set([2, 3]);
 
 interface ProjectData {
   title: string;
@@ -35,6 +35,7 @@ const projectData: ProjectData = {
 export default function ProjectPage() {
   const sidebarRef = useRef<HTMLElement>(null);
   const exchangeVideoRef = useRef<HTMLVideoElement>(null);
+  const refundSwitchVideoRef = useRef<HTMLVideoElement>(null);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -45,10 +46,13 @@ export default function ProjectPage() {
 
   useEffect(() => {
     if (!VIDEO_INDICES.has(activeImageIndex)) return;
+    const activeVideo = activeImageIndex === 2 ? exchangeVideoRef.current : refundSwitchVideoRef.current;
+    if (!activeVideo) return;
+
     if (isPaused) {
-      exchangeVideoRef.current?.pause();
+      activeVideo.pause();
     } else {
-      exchangeVideoRef.current?.play().catch(() => { });
+      activeVideo.play().catch(() => { });
     }
   }, [isPaused, activeImageIndex]);
 
@@ -291,21 +295,23 @@ export default function ProjectPage() {
             </video>
           </motion.div>
 
-          {/* Mid Exchange refund GIF - index 3 */}
+          {/* Mid Exchange refund video - index 3 */}
           <motion.div
             className="project-detail-image-wrapper"
             initial={{ opacity: 0 }}
             animate={{ opacity: activeImageIndex === 3 ? 1 : 0 }}
             transition={{ duration: 0.4 }}
           >
-            <Image
-              src="/Mid Exchange refund.gif"
-              alt="Mid exchange to refund flow"
-              width={1200}
-              height={800}
+            <video
+              ref={refundSwitchVideoRef}
               className="project-screenshot"
-              unoptimized
-            />
+              muted
+              loop
+              playsInline
+              style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }}
+            >
+              <source src="/Mid Exchange refund.mp4" type="video/mp4" />
+            </video>
           </motion.div>
 
           {/* Review your return - index 4 */}
